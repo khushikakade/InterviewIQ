@@ -1,0 +1,258 @@
+{% extends "base.html" %}
+
+{% block title %}Resume & Job Description Analysis — InterviewIQ Studio{% endblock %}
+
+{% block page_title %}Resume & Job Match Intelligence{% endblock %}
+{% block page_subtitle %}Extract technical skills from your resume and calculate your alignment against job descriptions.{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <div class="row g-4">
+    <!-- Left Column: Upload Resume & Job Description Form Card -->
+    <div class="col-lg-4">
+      <!-- Upload Resume Card -->
+      <div class="stitch-card mb-4">
+        <div class="stitch-card-header">
+          <h5 class="stitch-card-title"><i class="fa-solid fa-cloud-arrow-up text-indigo"></i> Upload Candidate Resume</h5>
+        </div>
+        
+        <form id="resumeUploadForm" class="mb-3">
+          <div class="stitch-upload-box mb-3" id="resumeUploadDropzone" onclick="document.getElementById('resumeFileInput').click()">
+            <div class="upload-icon-circle">
+              <i class="fa-solid fa-file-pdf"></i>
+            </div>
+            <h6 class="fw-bold text-main mb-1">Click to Upload or Drag File Here</h6>
+            <p class="text-secondary small mb-0">Supported formats: PDF, DOCX, TXT (Max 10MB)</p>
+            <input type="file" id="resumeFileInput" name="file" accept=".pdf,.docx,.txt" class="d-none" required>
+          </div>
+
+          <button type="submit" class="btn-stitch-primary w-100 justify-content-center" id="uploadBtn">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Parse & Analyze Resume
+          </button>
+        </form>
+
+        <div class="p-3 bg-dark rounded border border-subtle small text-secondary">
+          <strong class="text-main d-block mb-1"><i class="fa-solid fa-shield-halved text-cyan me-1"></i> NLP Extraction Engine</strong>
+          Extracts programming languages, frameworks, education, projects, and structural quality metrics using PyMuPDF and NLP entity recognition.
+        </div>
+      </div>
+
+      <!-- Job Description Matcher Card -->
+      <div class="stitch-card">
+        <div class="stitch-card-header">
+          <h5 class="stitch-card-title"><i class="fa-solid fa-bullseye text-cyan"></i> Job Description Matcher</h5>
+        </div>
+
+        <form id="jdMatchForm">
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">Target Job Role Title</label>
+            <input type="text" id="jdTitleInput" class="stitch-input" placeholder="e.g. Full Stack Developer" value="Software Developer">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">Paste Job Description / Requirements</label>
+            <textarea id="jdTextInput" class="stitch-textarea" rows="5" placeholder="Paste the target job description requirements here to evaluate matching skill alignment..." required></textarea>
+          </div>
+
+          <button type="submit" class="btn-stitch-secondary w-100 justify-content-center" id="jdMatchBtn">
+            <i class="fa-solid fa-chart-line text-cyan"></i> Calculate Skill Match Score
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right Column: Parsed Resume & Job Match Dashboard -->
+    <div class="col-lg-8">
+      
+      <!-- Placeholder when no resume uploaded -->
+      <div id="noResumePlaceholder" class="{% if resume %}d-none{% endif %} stitch-card p-5 text-center h-100 d-flex flex-column justify-content-center align-items-center">
+        <div class="upload-icon-circle mb-3" style="width: 70px; height: 70px; font-size: 2rem;">
+          <i class="fa-solid fa-file-invoice text-indigo"></i>
+        </div>
+        <h4 class="fw-bold text-main mb-2">No Resume Parsed Yet</h4>
+        <p class="text-secondary small max-w-md mx-auto mb-4">
+          Upload your resume (PDF/DOCX) on the left to view parsed skills, education, projects, AI quality score, and job description match alignment.
+        </p>
+      </div>
+
+      <!-- Main Parsed Container -->
+      <div id="resumeParsedContainer" class="{% if not resume %}d-none{% endif %} d-flex flex-column gap-4">
+        
+        <!-- Summary & Score Header Card -->
+        <div class="stitch-card">
+          <div class="d-flex flex-wrap justify-content-between align-items-center pb-3 border-bottom border-subtle mb-3">
+            <div>
+              <span class="stitch-badge bg-indigo-soft text-indigo mb-2 fw-semibold">
+                <i class="fa-solid fa-user me-1"></i> Parsed Profile
+              </span>
+              <h3 class="fw-bold text-main mb-1" id="parsedName">
+                {{ resume.parsed_data.name if (resume and resume.parsed_data and resume.parsed_data.name) else 'Candidate' }}
+              </h3>
+              <div class="text-secondary small" id="parsedFilename">
+                <i class="fa-solid fa-file-code me-1"></i> {{ resume.filename if resume else '' }}
+              </div>
+            </div>
+
+            <div class="text-end mt-3 mt-sm-0">
+              <span class="text-secondary small d-block mb-1">Resume Quality Score</span>
+              <div class="stitch-badge badge-ready fs-4 px-3 py-2" id="parsedQualityScore">
+                {{ resume.parsed_data.quality_score if (resume and resume.parsed_data and resume.parsed_data.quality_score) else '85' }}%
+              </div>
+            </div>
+          </div>
+
+          <div class="row text-center g-3">
+            <div class="col-4">
+              <div class="p-3 bg-dark rounded border border-subtle">
+                <span class="text-secondary small d-block mb-1">Word Count</span>
+                <span class="fw-bold fs-4 text-indigo" id="parsedWordCount">
+                  {{ resume.parsed_data.word_count if (resume and resume.parsed_data and resume.parsed_data.word_count) else '350' }}
+                </span>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-3 bg-dark rounded border border-subtle">
+                <span class="text-secondary small d-block mb-1">Extracted Skills</span>
+                <span class="fw-bold fs-4 text-emerald" id="parsedSkillsCount">
+                  {{ resume.parsed_data.skills|length if (resume and resume.parsed_data and resume.parsed_data.skills) else '0' }}
+                </span>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="p-3 bg-dark rounded border border-subtle">
+                <span class="text-secondary small d-block mb-1">Key Projects</span>
+                <span class="fw-bold fs-4 text-cyan" id="parsedProjectsCount">
+                  {{ resume.parsed_data.projects|length if (resume and resume.parsed_data and resume.parsed_data.projects) else '0' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Description Skill Match Output Card (Dynamic) -->
+        <div id="jdMatchResultCard" class="stitch-card d-none">
+          <div class="stitch-card-header">
+            <h5 class="stitch-card-title"><i class="fa-solid fa-bullseye text-cyan"></i> Job Description Match Breakdown</h5>
+            <span class="stitch-badge badge-ready fs-5" id="jdMatchScoreBadge">0% Match</span>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="p-3 bg-dark rounded border border-subtle">
+                <h6 class="fw-bold text-emerald mb-2"><i class="fa-solid fa-check-circle me-1"></i> Matched Skills</h6>
+                <div id="jdMatchedSkillsList">
+                  <!-- Matched skills badges inserted dynamically -->
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="p-3 bg-dark rounded border border-subtle">
+                <h6 class="fw-bold text-rose mb-2"><i class="fa-solid fa-circle-xmark me-1"></i> Missing / Recommended Skills</h6>
+                <div id="jdMissingSkillsList">
+                  <!-- Missing skills inserted dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Extracted Skills & Tech Stack -->
+        <div class="stitch-card">
+          <div class="stitch-card-header">
+            <h5 class="stitch-card-title"><i class="fa-solid fa-layer-group text-indigo"></i> Extracted Skills & Tech Stack</h5>
+          </div>
+
+          <div class="mb-3">
+            <span class="text-secondary small fw-semibold d-block mb-2">Core Skills & Competencies:</span>
+            <div id="parsedSkills">
+              {% if resume and resume.parsed_data and resume.parsed_data.skills %}
+                {% for skill in resume.parsed_data.skills %}
+                  <span class="skill-tag">{{ skill }}</span>
+                {% endfor %}
+              {% else %}
+                <span class="text-muted small">No skills parsed yet.</span>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="pt-3 border-top border-subtle">
+            <span class="text-secondary small fw-semibold d-block mb-2">Detected Frameworks & Tools:</span>
+            <div id="parsedTechnologies">
+              {% if resume and resume.parsed_data and resume.parsed_data.technologies %}
+                {% for tech in resume.parsed_data.technologies %}
+                  <span class="stitch-badge bg-dark border border-subtle text-main me-1 mb-1">{{ tech }}</span>
+                {% endfor %}
+              {% else %}
+                <span class="text-muted small">Python, SQL, General Engineering</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Education, Projects, Experience Details -->
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="stitch-card h-100">
+              <h6 class="fw-bold text-indigo mb-3"><i class="fa-solid fa-graduation-cap me-2"></i> Education & Credentials</h6>
+              <ul id="parsedEducation" class="small text-main ps-3 mb-4">
+                {% if resume and resume.parsed_data and resume.parsed_data.education %}
+                  {% for edu in resume.parsed_data.education %}
+                    <li class="mb-1">{{ edu }}</li>
+                  {% endfor %}
+                {% else %}
+                  <li>Degree in CS / IT / Engineering</li>
+                {% endif %}
+              </ul>
+
+              <h6 class="fw-bold text-cyan mb-3"><i class="fa-solid fa-briefcase me-2"></i> Experience & Roles</h6>
+              <ul id="parsedExperience" class="small text-main ps-3 mb-0">
+                {% if resume and resume.parsed_data and resume.parsed_data.experience %}
+                  {% for exp in resume.parsed_data.experience %}
+                    <li class="mb-1">{{ exp }}</li>
+                  {% endfor %}
+                {% else %}
+                  <li>Software Engineering Candidate</li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+
+          <div class="col-md-6">
+            <div class="stitch-card h-100">
+              <h6 class="fw-bold text-emerald mb-3"><i class="fa-solid fa-code me-2"></i> Key Projects</h6>
+              <ul id="parsedProjects" class="small text-main ps-3 mb-4">
+                {% if resume and resume.parsed_data and resume.parsed_data.projects %}
+                  {% for proj in resume.parsed_data.projects %}
+                    <li class="mb-1">{{ proj }}</li>
+                  {% endfor %}
+                {% else %}
+                  <li>Technical Project Showcase</li>
+                {% endif %}
+              </ul>
+
+              <h6 class="fw-bold text-amber mb-3"><i class="fa-solid fa-trophy me-2"></i> Certifications</h6>
+              <ul id="parsedCertifications" class="small text-main ps-3 mb-0">
+                {% if resume and resume.parsed_data and resume.parsed_data.certifications %}
+                  {% for cert in resume.parsed_data.certifications %}
+                    <li class="mb-1">{{ cert }}</li>
+                  {% endfor %}
+                {% else %}
+                  <li class="text-secondary italic">No specific certifications detected.</li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/resume.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}Mock Interview Session — InterviewIQ Studio{% endblock %}
+
+{% block page_title %}Mock Interview Session{% endblock %}
+{% block page_subtitle %}Live WebCam analysis, speech-to-text transcription, and MediaPipe eye contact tracking.{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <!-- Header Progress Bar -->
+  <div class="stitch-card mb-4 p-3 d-flex flex-wrap justify-content-between align-items-center">
+    <div class="d-flex align-items-center gap-3">
+      <span class="stitch-badge bg-indigo-soft text-indigo">
+        {{ interview.role }} ({{ interview.difficulty }})
+      </span>
+      <h5 class="fw-bold mb-0 text-main fs-5">
+        Question <span id="currentQuestionNum" class="text-indigo">1</span> of {{ questions|length }}
+      </h5>
+    </div>
+
+    <div class="d-flex align-items-center gap-4 mt-2 mt-md-0">
+      <div class="text-secondary small fw-semibold">
+        <i class="fa-solid fa-clock text-amber me-1"></i> Session Timer: <span id="timerDisplay" class="text-main fw-bold font-monospace">00:00</span>
+      </div>
+      <div class="progress bg-dark" style="width: 160px; height: 8px; border-radius: var(--radius-pill); border: 1px solid var(--border-subtle);">
+        <div id="progressBar" class="progress-bar bg-indigo" style="width: 20%; border-radius: var(--radius-pill);"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Left Column: WebCam Video & Live Metrics Grid -->
+    <div class="col-lg-6">
+      <div class="stitch-card p-3">
+        
+        <div class="webcam-preview-box mb-3">
+          <video id="webcamFeed" autoplay playsinline muted></video>
+          
+          <div class="webcam-overlay-tag">
+            <span class="pulse-dot"></span>
+            <span id="eyeCueText">Eye Contact: Monitoring</span>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center bg-dark p-3 rounded border border-subtle mb-3">
+          <div class="d-flex align-items-center gap-2">
+            <i class="fa-solid fa-microphone text-cyan"></i>
+            <span class="small text-secondary fw-semibold">Audio Level Indicator:</span>
+          </div>
+          <div class="sound-wave">
+            <bar></bar><bar></bar><bar></bar><bar></bar><bar></bar>
+          </div>
+        </div>
+
+        <!-- 4 Live Metric Tiles Card Grid -->
+        <div class="row g-2 text-center">
+          <div class="col-6 col-md-3">
+            <div class="metric-tile p-2">
+              <div class="metric-label justify-content-center gap-1 fs-8">
+                <i class="fa-solid fa-eye text-emerald"></i> Eye Contact
+              </div>
+              <div class="fw-bold fs-6 text-emerald" id="liveEyeMetric">Analyzing...</div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <div class="metric-tile p-2">
+              <div class="metric-label justify-content-center gap-1 fs-8">
+                <i class="fa-solid fa-gauge text-amber"></i> Speech Rate
+              </div>
+              <div class="fw-bold fs-6 text-amber" id="liveSpeechMetric">Analyzing...</div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <div class="metric-tile p-2">
+              <div class="metric-label justify-content-center gap-1 fs-8">
+                <i class="fa-solid fa-comment-slash text-rose"></i> Filler Words
+              </div>
+              <div class="fw-bold fs-6 text-rose" id="liveFillersMetric">Analyzing...</div>
+            </div>
+          </div>
+
+          <div class="col-6 col-md-3">
+            <div class="metric-tile p-2">
+              <div class="metric-label justify-content-center gap-1 fs-8">
+                <i class="fa-solid fa-head-side-virus text-cyan"></i> Stability
+              </div>
+              <div class="fw-bold fs-6 text-cyan" id="liveStabilityMetric">Analyzing...</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right Column: Question & Controls Card -->
+    <div class="col-lg-6">
+      <div class="stitch-card h-100 p-4 d-flex flex-column justify-content-between">
+        
+        <div>
+          <!-- Question Palette Button Pills -->
+          <div class="d-flex flex-wrap gap-2 mb-3" id="questionPalette">
+            {% for q in questions %}
+              <button class="btn btn-sm btn-stitch-secondary q-nav-btn py-1 px-3" data-idx="{{ loop.index0 }}" id="qNavBtn_{{ loop.index0 }}">
+                Q{{ loop.index }}
+              </button>
+            {% endfor %}
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="stitch-badge bg-dark border border-subtle text-indigo" id="questionCategory">Category</span>
+            <span class="stitch-badge bg-dark border border-subtle text-cyan" id="questionType">Technical</span>
+          </div>
+
+          <h4 class="fw-bold text-main mb-3" id="questionText">Loading Question...</h4>
+
+          <!-- Answer Transcript Textarea Box -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <label class="form-label text-secondary small fw-semibold mb-0">Speech Transcript / Response Input:</label>
+              <span class="small text-muted" id="answerSavedBadge">Auto-transcribed or typed</span>
+            </div>
+            <textarea class="stitch-textarea" id="transcriptTextarea" rows="4" placeholder="Your spoken answer will be transcribed here automatically via Speech-to-Text. You can also type or edit your response manually..."></textarea>
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div>
+          <div class="d-flex flex-wrap gap-2 mb-3">
+            <button class="btn-stitch-primary bg-danger border-0 flex-grow-1 justify-content-center" id="startRecBtn">
+              <i class="fa-solid fa-circle text-white"></i> Start Recording
+            </button>
+            <button class="btn-stitch-secondary border-warning text-warning flex-grow-1 justify-content-center d-none" id="stopRecBtn">
+              <i class="fa-solid fa-square"></i> Stop Recording
+            </button>
+            <button class="btn-stitch-primary flex-grow-1 justify-content-center" id="submitAnswerBtn">
+              <i class="fa-solid fa-paper-plane"></i> Submit Answer
+            </button>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 pt-2 border-top border-subtle">
+            <div class="d-flex gap-2">
+              <button class="btn-stitch-secondary btn-sm" id="prevQuestionBtn">
+                <i class="fa-solid fa-arrow-left"></i> Prev
+              </button>
+              <button class="btn-stitch-secondary btn-sm" id="nextQuestionBtn">
+                Next <i class="fa-solid fa-arrow-right"></i>
+              </button>
+            </div>
+            <button class="btn-stitch-danger btn-sm" id="finishSessionBtn">
+              <i class="fa-solid fa-flag-checkered"></i> Finish Interview
+            </button>
+          </div>
+          <div class="text-center mt-2">
+            <span class="small text-muted" id="sessionStatusText">Ready for answer</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Embed JSON questions array safely -->
+<script id="questionsData" type="application/json">
+  [
+    {% for q in questions %}
+      {
+        "id": {{ q.id }},
+        "order_num": {{ q.order_num }},
+        "question_text": {{ q.question_text|tojson }},
+        "question_type": {{ q.question_type|tojson }},
+        "category": {{ (q.category or "General")|tojson }}
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+</script>
+<script>
+  window.INTERVIEW_ID = {{ interview.id }};
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/interview.js') }}"></script>
+{% endblock %}

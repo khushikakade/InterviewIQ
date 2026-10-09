@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Mock Interview Setup — InterviewIQ Studio{% endblock %}
+
+{% block page_title %}Mock Interview Setup Studio{% endblock %}
+{% block page_subtitle %}Configure target role, difficulty, questions count, and linked resume skills for personalized AI evaluation.{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="stitch-card p-4">
+        
+        <div class="stitch-card-header mb-4">
+          <h4 class="stitch-card-title fs-4">
+            <i class="fa-solid fa-sliders text-indigo"></i> Configure Your AI Mock Session
+          </h4>
+          <span class="stitch-badge bg-dark border border-subtle text-main">Personalized AI Questions</span>
+        </div>
+
+        <form action="{{ url_for('interview.setup_view') }}" method="POST">
+          
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-semibold">Target Job Role</label>
+              <input type="text" name="role" id="roleInput" list="targetRoleOptions" class="stitch-input" value="Software Developer" required placeholder="Select or type target role...">
+              <datalist id="targetRoleOptions">
+                <option value="Software Developer"></option>
+                <option value="Full Stack Web Developer"></option>
+                <option value="Backend Engineer"></option>
+                <option value="Frontend Engineer"></option>
+                <option value="Machine Learning Engineer"></option>
+                <option value="AI & Data Scientist"></option>
+                <option value="Data Engineer"></option>
+                <option value="DevOps & Cloud Engineer"></option>
+                <option value="Cybersecurity Analyst"></option>
+                <option value="Product Manager"></option>
+              </datalist>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label text-secondary small fw-semibold">Interview Type</label>
+              <select name="interview_type" class="stitch-select">
+                <option value="Mixed" selected>Mixed (Technical + HR + STAR Behavioral)</option>
+                <option value="Technical">Technical & Architecture Only</option>
+                <option value="Behavioral">Behavioral (STAR Method Focus)</option>
+                <option value="HR">HR & Cultural Fit</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-semibold">Difficulty Level</label>
+              <select name="difficulty" class="stitch-select">
+                <option value="Easy">Easy (Foundational Concepts)</option>
+                <option value="Medium" selected>Medium (Standard Industry)</option>
+                <option value="Hard">Hard (Senior Trade-offs)</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-semibold">Number of Questions</label>
+              <select name="question_count" class="stitch-select">
+                <option value="3">3 Questions (Express Practice)</option>
+                <option value="5" selected>5 Questions (Standard Session)</option>
+                <option value="8">8 Questions (Full Mock Assessment)</option>
+              </select>
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label text-secondary small fw-semibold">Linked Resume Profile</label>
+              <select name="resume_id" class="stitch-select">
+                {% if resumes %}
+                  {% for r in resumes %}
+                    <option value="{{ r.id }}">{{ r.filename }} ({{ r.parsed_data.skills|length }} skills)</option>
+                  {% endfor %}
+                {% else %}
+                  <option value="">Default Profile (Python, SQL, ML)</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+
+          <!-- Device Permission Check Card -->
+          <div class="p-3 bg-dark rounded border border-subtle d-flex align-items-center gap-3 mb-4">
+            <div class="upload-icon-circle m-0" style="width: 44px; height: 44px; font-size: 1.1rem; flex-shrink: 0;">
+              <i class="fa-solid fa-video text-cyan"></i>
+            </div>
+            <div class="small">
+              <strong class="text-main d-block">WebCam & Microphone Readiness Check:</strong>
+              <span class="text-secondary">InterviewIQ monitors speech pacing, filler words, posture, and MediaPipe eye contact in real-time. Camera access is requested when session starts.</span>
+            </div>
+          </div>
+
+          <!-- Submit Buttons -->
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('dashboard.dashboard_view') }}" class="btn-stitch-secondary">
+              <i class="fa-solid fa-arrow-left"></i> Cancel
+            </a>
+            <button type="submit" class="btn-stitch-primary btn-lg">
+              <i class="fa-solid fa-play"></i> Generate & Start Mock Interview
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,244 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard — InterviewIQ Studio{% endblock %}
+
+{% block page_title %}Network Intelligence Dashboard{% endblock %}
+{% block page_subtitle %}Real-time candidate evaluation metrics, performance trends, and AI analysis overview.{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <!-- Welcome Banner -->
+  <div class="stitch-card mb-4 d-flex flex-wrap justify-content-between align-items-center bg-gradient">
+    <div>
+      <h3 class="fw-bold mb-1 text-main">Welcome back, {{ user.username }}! 👋</h3>
+      <p class="text-secondary mb-0 small">NETSIMX / InterviewIQ Studio — Design networks. Simulate traffic. Analyse performance. Understand failures.</p>
+    </div>
+    <div class="mt-3 mt-md-0">
+      <a href="{{ url_for('interview.setup_view') }}" class="btn-stitch-primary">
+        <i class="fa-solid fa-play"></i> Open Topology Studio / Start Mock Session
+      </a>
+    </div>
+  </div>
+
+  <!-- Top Overview Cards Row -->
+  <div class="row g-4 mb-4">
+    <!-- Hero Radial Score Ring Card -->
+    <div class="col-lg-4">
+      <div class="stitch-card readiness-ring-card h-100 d-flex flex-column justify-content-center p-4">
+        <span class="text-secondary small fw-semibold text-uppercase tracking-wider d-block mb-3">Overall Interview Readiness</span>
+        
+        <div class="radial-progress-box my-2">
+          <svg viewBox="0 0 100 100">
+            <circle class="radial-progress-bg" cx="50" cy="50" r="40" fill="none" />
+            <circle class="radial-progress-val" id="readinessProgressCircle" cx="50" cy="50" r="40" fill="none" 
+                    stroke-dasharray="251.2" stroke-dashoffset="{{ 251.2 - (251.2 * (avg_readiness or 0) / 100) if avg_readiness else 251.2 }}" />
+          </svg>
+          <div class="radial-score-num">
+            {% if avg_readiness is not none %}{{ avg_readiness }}%{% else %}--{% endif %}
+          </div>
+        </div>
+
+        <div class="mt-3">
+          {% if avg_readiness is not none %}
+            {% if avg_readiness >= 75 %}
+              <span class="stitch-badge badge-ready"><i class="fa-solid fa-circle-check"></i> READY FOR INTERVIEW</span>
+            {% elif avg_readiness >= 60 %}
+              <span class="stitch-badge badge-moderate"><i class="fa-solid fa-circle-exclamation"></i> MODERATE READINESS</span>
+            {% else %}
+              <span class="stitch-badge badge-needs-practice"><i class="fa-solid fa-triangle-exclamation"></i> NEEDS PRACTICE</span>
+            {% endif %}
+          {% else %}
+            <span class="stitch-badge text-secondary border border-secondary">NO COMPLETED SESSIONS</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- 6 Dimension Metric Tiles -->
+    <div class="col-lg-8">
+      <div class="row g-3 h-100">
+        <div class="col-md-4 col-6">
+          <div class="metric-tile">
+            <div class="metric-label">
+              <span>Technical Depth</span>
+              <i class="fa-solid fa-code text-indigo"></i>
+            </div>
+            <div class="metric-val text-indigo">{% if latest_score %}{{ latest_score.technical_knowledge_score }}%{% else %}--{% endif %}</div>
+            <div class="metric-sub">NLP & Concept Similarity</div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-6">
+          <div class="metric-tile">
+            <div class="metric-label">
+              <span>Communication</span>
+              <i class="fa-solid fa-comments text-cyan"></i>
+            </div>
+            <div class="metric-val text-cyan">{% if latest_score %}{{ latest_score.communication_score }}%{% else %}--{% endif %}</div>
+            <div class="metric-sub">Clarity & Vocabulary</div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-6">
+          <div class="metric-tile">
+            <div class="metric-label">
+              <span>Presentation Cues</span>
+              <i class="fa-solid fa-eye text-emerald"></i>
+            </div>
+            <div class="metric-val text-emerald">{% if latest_score %}{{ latest_score.body_language_score }}%{% else %}--{% endif %}</div>
+            <div class="metric-sub">MediaPipe Eye Stability</div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-6">
+          <div class="metric-tile">
+            <div class="metric-label">
+              <span>Speech Pacing</span>
+              <i class="fa-solid fa-gauge text-amber"></i>
+            </div>
+            <div class="metric-val text-amber">{% if latest_score %}{{ latest_score.speech_score }}%{% else %}--{% endif %}</div>
+            <div class="metric-sub">WPM & Low Fillers</div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-6">
+          <div class="metric-tile">
+            <div class="metric-label">
+              <span>Answer Structure</span>
+              <i class="fa-solid fa-diagram-project text-rose"></i>
+            </div>
+            <div class="metric-val text-rose">{% if latest_score %}{{ latest_score.structure_score }}%{% else %}--{% endif %}</div>
+            <div class="metric-sub">STAR Framework Method</div>
+          </div>
+        </div>
+
+        <div class="col-md-4 col-6">
+          <div class="metric-tile">
+            <div class="metric-label">
+              <span>Answer Quality</span>
+              <i class="fa-solid fa-award text-purple"></i>
+            </div>
+            <div class="metric-val text-purple">{% if latest_score %}{{ latest_score.answer_quality_score }}%{% else %}--{% endif %}</div>
+            <div class="metric-sub">Relevance & Accuracy</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance Trend Charts Row -->
+  <div class="row g-4 mb-4">
+    <div class="col-lg-8">
+      <div class="stitch-card p-4">
+        <div class="stitch-card-header">
+          <h5 class="stitch-card-title"><i class="fa-solid fa-chart-line text-indigo"></i> Performance Progression Over Time</h5>
+          <span class="text-secondary small">Historical Sessions</span>
+        </div>
+        <div style="height: 280px; position: relative;">
+          <canvas id="scoreTrendChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="stitch-card p-4 h-100">
+        <div class="stitch-card-header">
+          <h5 class="stitch-card-title"><i class="fa-solid fa-comment-slash text-amber"></i> Speech Filler Words</h5>
+          <span class="text-secondary small">Per Session</span>
+        </div>
+        <div style="height: 220px; position: relative;">
+          <canvas id="fillerWordsChart"></canvas>
+        </div>
+        <div class="p-2 mt-2 bg-dark rounded border border-subtle small text-secondary">
+          <i class="fa-solid fa-circle-info text-amber me-1"></i> Target: Under 5 filler words per interview.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Details Row: Recent Sessions & Top Weaknesses -->
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <div class="stitch-card p-4">
+        <div class="stitch-card-header">
+          <h5 class="stitch-card-title"><i class="fa-solid fa-history text-indigo"></i> Recent Mock Sessions</h5>
+          <a href="{{ url_for('analysis.history_view') }}" class="text-indigo small text-decoration-none fw-semibold">View All <i class="fa-solid fa-chevron-right ms-1"></i></a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="stitch-table">
+            <thead>
+              <tr>
+                <th>Role Target</th>
+                <th>Interview Type</th>
+                <th>Overall Score</th>
+                <th>Readiness</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if recent_interviews %}
+                {% for item in recent_interviews %}
+                  <tr>
+                    <td class="fw-semibold">{{ item.role }}</td>
+                    <td><span class="stitch-badge bg-dark border border-subtle text-main">{{ item.interview_type }}</span></td>
+                    <td class="fw-bold text-emerald">{{ item.overall_score }}%</td>
+                    <td>
+                      {% if item.overall_score and item.overall_score >= 75 %}
+                        <span class="stitch-badge badge-ready">Ready</span>
+                      {% else %}
+                        <span class="stitch-badge badge-moderate">Practice</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <a href="{{ url_for('analysis.report_view', interview_id=item.id) }}" class="btn-stitch-secondary py-1 px-3 fs-7">
+                        Report
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td colspan="5" class="text-center text-muted py-4">No completed interviews yet. Start your first session above!</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="stitch-card p-4 h-100 d-flex flex-column justify-content-between">
+        <div>
+          <div class="stitch-card-header">
+            <h5 class="stitch-card-title"><i class="fa-solid fa-bullseye text-rose"></i> Top Weaknesses & Recommendations</h5>
+          </div>
+
+          <div class="mb-3">
+            <span class="stitch-badge badge-needs-practice me-1 mb-1">Technical Depth</span>
+            <span class="stitch-badge badge-moderate me-1 mb-1">Filler Words</span>
+            <span class="stitch-badge badge-moderate me-1 mb-1">STAR Method Structure</span>
+          </div>
+
+          <p class="small text-secondary mb-4">
+            AI Insight: Increase specific technical terminology and code architecture trade-offs. Structure behavioral scenarios with explicit Situation, Task, Action, and Result steps.
+          </p>
+        </div>
+
+        <div>
+          <a href="{{ url_for('practice.practice_view') }}" class="btn-stitch-primary w-100 justify-content-center">
+            <i class="fa-solid fa-bolt"></i> Launch Targeted Practice Mode
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

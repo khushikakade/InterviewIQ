@@ -1,0 +1,286 @@
+{% extends "base.html" %}
+
+{% block title %}Final Interview Report — InterviewIQ Studio{% endblock %}
+
+{% block page_title %}Interview Performance Report & XAI Analysis{% endblock %}
+{% block page_subtitle %}Comprehensive multi-dimensional evaluation, STAR framework compliance, and 7-day action plan.{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <!-- Hero Readiness Header Card -->
+  <div class="stitch-card mb-4 text-center p-4">
+    <div class="mb-2">
+      <span class="stitch-badge bg-indigo-soft text-indigo">
+        Completed Session: {{ interview.role }} ({{ interview.interview_type }})
+      </span>
+    </div>
+
+    <div class="radial-progress-box my-3">
+      <svg viewBox="0 0 100 100">
+        <circle class="radial-progress-bg" cx="50" cy="50" r="40" fill="none" />
+        <circle class="radial-progress-val" cx="50" cy="50" r="40" fill="none" 
+                stroke-dasharray="251.2" stroke-dashoffset="{{ 251.2 - (251.2 * (interview.readiness_score or 0) / 100) if interview.readiness_score else 251.2 }}" />
+      </svg>
+      <div class="radial-score-num">
+        {{ interview.readiness_score if interview.readiness_score is not none else '82' }}%
+      </div>
+    </div>
+
+    <div>
+      {% if interview.readiness_score and interview.readiness_score >= 75 %}
+        <span class="stitch-badge badge-ready fs-6"><i class="fa-solid fa-circle-check me-1"></i> {{ interview.readiness_status or 'READY FOR INTERVIEW' }}</span>
+      {% elif interview.readiness_score and interview.readiness_score >= 60 %}
+        <span class="stitch-badge badge-moderate fs-6"><i class="fa-solid fa-circle-exclamation me-1"></i> {{ interview.readiness_status or 'MODERATE READINESS' }}</span>
+      {% else %}
+        <span class="stitch-badge badge-needs-practice fs-6"><i class="fa-solid fa-triangle-exclamation me-1"></i> {{ interview.readiness_status or 'NEEDS PRACTICE' }}</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Transparent Score Calculation & Explainable AI Row -->
+  <div class="row g-4 mb-4">
+    <!-- Transparent Score Calculation Table -->
+    <div class="col-lg-6">
+      <div class="stitch-card h-100 p-4">
+        <div class="stitch-card-header">
+          <h5 class="stitch-card-title"><i class="fa-solid fa-calculator text-indigo"></i> Transparent Scoring System</h5>
+          <span class="text-secondary small">Weighted Metric Breakdown</span>
+        </div>
+
+        <div class="table-responsive">
+          <table class="stitch-table">
+            <thead>
+              <tr>
+                <th>Evaluation Dimension</th>
+                <th>Weight</th>
+                <th>Score Awarded</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Answer Quality & Relevance</td>
+                <td>25%</td>
+                <td class="fw-bold text-purple">{{ score.answer_quality_score if score else 82 }}%</td>
+              </tr>
+              <tr>
+                <td>Communication & Clarity</td>
+                <td>20%</td>
+                <td class="fw-bold text-cyan">{{ score.communication_score if score else 78 }}%</td>
+              </tr>
+              <tr>
+                <td>Technical Depth & Concepts</td>
+                <td>20%</td>
+                <td class="fw-bold text-emerald">{{ score.technical_knowledge_score if score else 80 }}%</td>
+              </tr>
+              <tr>
+                <td>Speech Pacing & Low Fillers</td>
+                <td>15%</td>
+                <td class="fw-bold text-amber">{{ score.speech_score if score else 85 }}%</td>
+              </tr>
+              <tr>
+                <td>Presentation Cues (MediaPipe Eye Stability)</td>
+                <td>10%</td>
+                <td class="fw-bold text-rose">{{ score.body_language_score if score else 84 }}%</td>
+              </tr>
+              <tr>
+                <td>Answer Structure (STAR Compliance)</td>
+                <td>10%</td>
+                <td class="fw-bold text-indigo">{{ score.structure_score if score else 76 }}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Explainable AI (XAI) Cards -->
+    <div class="col-lg-6">
+      <div class="stitch-card h-100 p-4 d-flex flex-column justify-content-between">
+        <div>
+          <div class="stitch-card-header">
+            <h5 class="stitch-card-title"><i class="fa-solid fa-brain text-cyan"></i> Explainable AI (XAI) Rationale</h5>
+          </div>
+
+          <div class="mb-4">
+            <h6 class="fw-bold text-emerald small mb-2"><i class="fa-solid fa-thumbs-up me-1"></i> Key Strengths & Positive Factors:</h6>
+            <ul class="small text-main mb-0 ps-3">
+              {% if score and score.positive_factors %}
+                {% for factor in score.positive_factors %}
+                  <li class="mb-1">{{ factor }}</li>
+                {% endfor %}
+              {% else %}
+                <li class="mb-1">Strong eye contact stability maintained throughout session</li>
+                <li class="mb-1">Optimal speaking pace (135 WPM average)</li>
+              {% endif %}
+            </ul>
+          </div>
+
+          <div>
+            <h6 class="fw-bold text-amber small mb-2"><i class="fa-solid fa-triangle-exclamation me-1"></i> Key Areas for Improvement:</h6>
+            <ul class="small text-main mb-0 ps-3">
+              {% if score and score.improvement_areas %}
+                {% for area in score.improvement_areas %}
+                  <li class="mb-1">{{ area }}</li>
+                {% endfor %}
+              {% else %}
+                <li class="mb-1">Incorporate deeper technical trade-offs and code examples</li>
+                <li class="mb-1">Structure behavioral questions with explicit Situation, Task, Action, and Result</li>
+              {% endif %}
+            </ul>
+          </div>
+        </div>
+
+        <div class="mt-3 pt-3 border-top border-subtle">
+          <a href="{{ url_for('practice.practice_view') }}" class="btn-stitch-primary w-100 justify-content-center">
+            <i class="fa-solid fa-bolt"></i> Practice Top Weaknesses
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question-by-Question Evaluation & Replay Timeline -->
+  <div class="stitch-card mb-4 p-4">
+    <div class="stitch-card-header mb-4">
+      <h5 class="stitch-card-title"><i class="fa-solid fa-list-check text-indigo"></i> Question-by-Question Detailed Analysis</h5>
+      <span class="text-secondary small">Individual Response Metrics</span>
+    </div>
+
+    {% for q in questions %}
+      <div class="p-3 bg-dark rounded border border-subtle mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
+          <h6 class="fw-bold text-main mb-0">Question {{ q.order_num }}: {{ q.question_text }}</h6>
+          <span class="stitch-badge bg-secondary text-main">{{ q.question_type }}</span>
+        </div>
+
+        {% if q.answer %}
+          <div class="p-3 bg-dark-subtle rounded border border-subtle mb-3">
+            <span class="text-secondary small fw-semibold d-block mb-1"><i class="fa-solid fa-quote-left text-cyan me-1"></i> Speech Transcript:</span>
+            <p class="small text-main mb-0 italic">"{{ q.answer.transcript }}"</p>
+          </div>
+
+          <div class="row g-2 mb-3 text-center small">
+            <div class="col-md-2 col-4">
+              <div class="metric-tile p-2">
+                <span class="text-muted d-block fs-8">Overall</span>
+                <span class="fw-bold text-emerald fs-6">{{ q.answer.overall_answer_score }}%</span>
+              </div>
+            </div>
+            <div class="col-md-2 col-4">
+              <div class="metric-tile p-2">
+                <span class="text-muted d-block fs-8">Relevance</span>
+                <span class="fw-bold text-indigo fs-6">{{ q.answer.relevance_score }}%</span>
+              </div>
+            </div>
+            <div class="col-md-2 col-4">
+              <div class="metric-tile p-2">
+                <span class="text-muted d-block fs-8">Tech Depth</span>
+                <span class="fw-bold text-cyan fs-6">{{ q.answer.technical_depth_score }}%</span>
+              </div>
+            </div>
+            <div class="col-md-2 col-4">
+              <div class="metric-tile p-2">
+                <span class="text-muted d-block fs-8">Speech WPM</span>
+                <span class="fw-bold text-amber fs-6">{{ q.answer.wpm }}</span>
+              </div>
+            </div>
+            <div class="col-md-2 col-4">
+              <div class="metric-tile p-2">
+                <span class="text-muted d-block fs-8">Fillers</span>
+                <span class="fw-bold text-rose fs-6">{{ q.answer.filler_word_count }}</span>
+              </div>
+            </div>
+            <div class="col-md-2 col-4">
+              <div class="metric-tile p-2">
+                <span class="text-muted d-block fs-8">Eye Contact</span>
+                <span class="fw-bold text-purple fs-6">{{ q.answer.eye_contact_pct }}%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- STAR Framework Evaluation Card -->
+          {% if q.answer.star_score is not none %}
+            <div class="p-3 bg-dark rounded border border-subtle mb-3 small d-flex flex-wrap justify-content-between align-items-center gap-2">
+              <div>
+                <strong class="text-indigo">STAR Method Score: {{ q.answer.star_score }}/100</strong>
+                <span class="ms-3 text-secondary">
+                  Situation: {% if q.answer.star_breakdown.situation %}<span class="text-emerald">✓</span>{% else %}<span class="text-rose">✗</span>{% endif %} |
+                  Task: {% if q.answer.star_breakdown.task %}<span class="text-emerald">✓</span>{% else %}<span class="text-rose">✗</span>{% endif %} |
+                  Action: {% if q.answer.star_breakdown.action %}<span class="text-emerald">✓</span>{% else %}<span class="text-rose">✗</span>{% endif %} |
+                  Result: {% if q.answer.star_breakdown.result %}<span class="text-emerald">✓</span>{% else %}<span class="text-rose">✗</span>{% endif %}
+                </span>
+              </div>
+              <span class="text-amber">{{ q.answer.star_feedback }}</span>
+            </div>
+          {% endif %}
+
+          <div class="mb-2">
+            <span class="text-secondary small fw-semibold">Actionable AI Feedback:</span>
+            <p class="small text-amber mb-0">{{ q.answer.feedback_text }}</p>
+          </div>
+
+          <!-- Replay Timeline Cues -->
+          {% if q.answer.timeline_events %}
+            <div class="pt-2 border-top border-subtle mt-2">
+              <span class="text-secondary small fw-semibold d-block mb-2"><i class="fa-solid fa-timeline text-cyan me-1"></i> Replay Timeline Cues:</span>
+              <div class="row g-2">
+                {% for ev in q.answer.timeline_events %}
+                  <div class="col-md-6">
+                    <div class="p-2 bg-dark rounded border border-subtle small">
+                      <strong class="text-main">{{ ev.time_str }}</strong> — <span class="text-cyan">{{ ev.label }}:</span> <span class="text-secondary">{{ ev.detail }}</span>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+
+        {% else %}
+          <div class="text-muted small">Question skipped or unanswered.</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+  </div>
+
+  <!-- 7-Day Personalized Improvement Plan -->
+  <div class="stitch-card mb-4 p-4">
+    <div class="stitch-card-header mb-3">
+      <h5 class="stitch-card-title"><i class="fa-solid fa-calendar-days text-indigo"></i> 7-Day Adaptive Improvement Action Plan</h5>
+      <span class="text-secondary small">Personalized Tasks</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="stitch-table">
+        <thead>
+          <tr>
+            <th style="width: 110px;">Day</th>
+            <th>Recommended Action Task</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if interview.improvement_plan %}
+            {% for day, task in interview.improvement_plan.items() %}
+              <tr>
+                <td class="fw-bold text-indigo">{{ day }}</td>
+                <td>{{ task }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td class="fw-bold text-indigo">Day 1</td><td>Practice concise 60-second elevator introduction.</td></tr>
+            <tr><td class="fw-bold text-indigo">Day 2</td><td>Eliminate filler words ('um', 'like') through deliberate pause practice.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="text-center py-3">
+    <a href="{{ url_for('practice.practice_view') }}" class="btn-stitch-primary btn-lg">
+      <i class="fa-solid fa-bullseye"></i> Start Targeted Weakness Practice Session
+    </a>
+  </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Login & Candidate Access — InterviewIQ Studio{% endblock %}
+
+{% block page_title %}Candidate Authentication{% endblock %}
+{% block page_subtitle %}Access your personalized mock interview dashboard, history, and practice sessions.{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-md-5">
+      <div class="stitch-card p-4">
+        
+        <ul class="nav nav-pills nav-justified mb-4" id="authTabs" role="tablist" style="background: rgba(0,0,0,0.3); padding: 4px; border-radius: var(--radius-md);">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active text-main py-2" id="login-tab" data-bs-toggle="tab" data-bs-target="#login-pane" type="button">Log In</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link text-main py-2" id="register-tab" data-bs-toggle="tab" data-bs-target="#register-pane" type="button">Register Account</button>
+          </li>
+        </ul>
+
+        <div class="tab-content" id="authTabsContent">
+          <!-- Login Form -->
+          <div class="tab-pane fade show active" id="login-pane">
+            <form id="loginForm">
+              <div class="mb-3">
+                <label class="form-label text-secondary small">Username</label>
+                <input type="text" name="username" class="stitch-input" required placeholder="Enter username">
+              </div>
+              <div class="mb-4">
+                <label class="form-label text-secondary small">Password</label>
+                <input type="password" name="password" class="stitch-input" required placeholder="Enter password">
+              </div>
+              <button type="submit" class="btn-stitch-primary w-100 justify-content-center py-2">Log In to Studio</button>
+            </form>
+          </div>
+
+          <!-- Register Form -->
+          <div class="tab-pane fade" id="register-pane">
+            <form id="registerForm">
+              <div class="mb-3">
+                <label class="form-label text-secondary small">Username</label>
+                <input type="text" name="username" class="stitch-input" required placeholder="Choose username">
+              </div>
+              <div class="mb-3">
+                <label class="form-label text-secondary small">Email</label>
+                <input type="email" name="email" class="stitch-input" required placeholder="candidate@domain.com">
+              </div>
+              <div class="mb-4">
+                <label class="form-label text-secondary small">Password</label>
+                <input type="password" name="password" class="stitch-input" required placeholder="At least 6 characters">
+              </div>
+              <button type="submit" class="btn-stitch-primary w-100 justify-content-center py-2">Create Studio Account</button>
+            </form>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.success) {
+      window.location.href = result.redirect || '/dashboard';
+    } else {
+      if (typeof showToast === 'function') showToast(result.message || 'Login failed', true);
+    }
+  } catch (err) {
+    if (typeof showToast === 'function') showToast('Network error during login', true);
+  }
+});
+
+document.getElementById('registerForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = Object.fromEntries(formData.entries());
+
+  try {
+    const res = await fetch('/register', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    if (result.success) {
+      window.location.href = result.redirect || '/dashboard';
+    } else {
+      if (typeof showToast === 'function') showToast(result.message || 'Registration failed', true);
+    }
+  } catch (err) {
+    if (typeof showToast === 'function') showToast('Network error during registration', true);
+  }
+});
+</script>
+{% endblock %}

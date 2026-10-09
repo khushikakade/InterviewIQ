@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Targeted Practice Mode — InterviewIQ Studio{% endblock %}
+
+{% block page_title %}Targeted Weakness Practice Mode{% endblock %}
+{% block page_subtitle %}Adaptive micro-practice scenarios tailored to re-evaluate detected weaknesses in real-time.{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <div class="row g-4 mb-4">
+    <!-- Active Detected Weaknesses Card -->
+    <div class="col-lg-4">
+      <div class="stitch-card h-100 p-4">
+        <div class="stitch-card-header mb-3">
+          <h5 class="stitch-card-title"><i class="fa-solid fa-triangle-exclamation text-amber"></i> Target Weaknesses</h5>
+        </div>
+        
+        <div>
+          {% for w in weaknesses %}
+            <div class="p-3 bg-dark rounded border border-subtle mb-3">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span class="stitch-badge badge-needs-practice fs-8">Weakness {{ loop.index }}</span>
+                <span class="text-secondary small">Re-evaluation Ready</span>
+              </div>
+              <h6 class="fw-bold text-main mb-1">{{ w }}</h6>
+              <p class="small text-muted mb-0">Micro-scenario practice to elevate score performance.</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Practice Question Scenario & Response Card -->
+    <div class="col-lg-8">
+      <div class="stitch-card h-100 p-4">
+        <div class="stitch-card-header mb-3">
+          <h5 class="stitch-card-title"><i class="fa-solid fa-pen-to-square text-cyan"></i> Adaptive Practice Scenario</h5>
+        </div>
+
+        <div id="practiceQuestionBox" class="p-3 bg-dark rounded border border-subtle mb-4">
+          <span class="stitch-badge bg-indigo-soft text-indigo mb-2" id="practiceWeaknessTag">Target: Technical Depth</span>
+          <h5 class="fw-bold text-main mb-0" id="practiceQuestionText">Loading practice question...</h5>
+        </div>
+
+        <form id="practiceForm">
+          <div class="mb-3">
+            <label class="form-label text-secondary small fw-semibold">Your Revised Response:</label>
+            <textarea class="stitch-textarea" id="practiceAnswerInput" rows="5" placeholder="Incorporate specific technical terms, practical architecture trade-offs, and structured explanation..." required></textarea>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <button type="button" class="btn-stitch-secondary" id="nextPracticeQBtn">
+              <i class="fa-solid fa-shuffle"></i> Try Another Question
+            </button>
+            <button type="submit" class="btn-stitch-primary" id="submitPracticeBtn">
+              <i class="fa-solid fa-check-double"></i> Re-Evaluate Response
+            </button>
+          </div>
+        </form>
+
+        <!-- Evaluation Feedback Output Card -->
+        <div id="practiceResultBox" class="mt-4 d-none p-3 rounded bg-dark border border-subtle">
+          <h6 class="fw-bold text-emerald mb-2"><i class="fa-solid fa-award me-1"></i> Re-Evaluation Feedback Report:</h6>
+          <p class="small text-main mb-0" id="practiceFeedbackText"></p>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Past Practice Sessions Table -->
+  <div class="stitch-card p-4">
+    <div class="stitch-card-header mb-3">
+      <h5 class="stitch-card-title"><i class="fa-solid fa-clock-rotate-left text-indigo"></i> Practice Attempt History</h5>
+      <span class="text-secondary small">Completed Micro-Practices</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="stitch-table">
+        <thead>
+          <tr>
+            <th>Target Weakness</th>
+            <th>Question Scenario</th>
+            <th>Re-Eval Score</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if past_sessions %}
+            {% for ps in past_sessions %}
+              <tr>
+                <td class="fw-semibold text-indigo">{{ ps.target_weakness }}</td>
+                <td class="small text-truncate" style="max-width: 350px;">{{ ps.question_text }}</td>
+                <td class="fw-bold text-emerald">{{ ps.score }}%</td>
+                <td>
+                  {% if ps.improved %}
+                    <span class="stitch-badge badge-ready">Improved</span>
+                  {% else %}
+                    <span class="stitch-badge badge-moderate">Practicing</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="4" class="text-center text-muted py-4">No practice attempts recorded yet. Submit your first revised response above!</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- Embed practice questions data -->
+<script id="practiceData" type="application/json">
+  [
+    {% for pq in practice_questions %}
+      {
+        "weakness": {{ pq.weakness|tojson }},
+        "question_text": {{ pq.question_text|tojson }}
+      }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+</script>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/practice.js') }}"></script>
+{% endblock %}

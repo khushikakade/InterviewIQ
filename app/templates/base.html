@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}InterviewIQ — AI Network & Performance Intelligence Studio{% endblock %}</title>
+
+  <!-- Google Fonts: Google Sans Text, Inter, JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans+Text:wght@400;500;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- FontAwesome 6 Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+  <!-- Custom Master Design System CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <div id="app-wrapper">
+    <!-- Left Navigation Sidebar (Stitch Design) -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div>
+        <div class="sidebar-header">
+          <a href="{{ url_for('dashboard.landing_page') }}" class="brand-logo">
+            <i class="fa-solid fa-brain"></i>
+            <span>InterviewIQ</span>
+            <span class="brand-badge">Studio</span>
+          </a>
+        </div>
+
+        <div class="sidebar-body">
+          <div class="nav-section-label">Studio Navigation</div>
+          <ul class="sidebar-nav">
+            <li class="sidebar-nav-item">
+              <a href="{{ url_for('dashboard.dashboard_view') }}" class="sidebar-nav-link {% if request.endpoint == 'dashboard.dashboard_view' %}active{% endif %}">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>Dashboard</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="{{ url_for('resume.resume_view') }}" class="sidebar-nav-link {% if request.endpoint == 'resume.resume_view' %}active{% endif %}">
+                <i class="fa-solid fa-file-invoice"></i>
+                <span>Resume & JD Match</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="{{ url_for('interview.setup_view') }}" class="sidebar-nav-link {% if 'interview' in request.endpoint and request.endpoint != 'analysis.history_view' %}active{% endif %}">
+                <i class="fa-solid fa-video"></i>
+                <span>Mock Interview</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="{{ url_for('practice.practice_view') }}" class="sidebar-nav-link {% if request.endpoint == 'practice.practice_view' %}active{% endif %}">
+                <i class="fa-solid fa-bullseye"></i>
+                <span>Practice Mode</span>
+              </a>
+            </li>
+            <li class="sidebar-nav-item">
+              <a href="{{ url_for('analysis.history_view') }}" class="sidebar-nav-link {% if request.endpoint == 'analysis.history_view' %}active{% endif %}">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+                <span>Interview History</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Sidebar User Profile Footer -->
+      <div class="sidebar-footer">
+        {% if session.get('user_id') %}
+          <div class="user-profile-card">
+            <div class="user-avatar">
+              {{ (session.get('username', 'U')[0])|upper }}
+            </div>
+            <div class="user-details">
+              <div class="user-name">{{ session.get('username', 'Candidate') }}</div>
+              <div class="user-role">Candidate Profile</div>
+            </div>
+            <a href="{{ url_for('auth.logout') }}" class="text-secondary hover-white ms-auto" title="Logout">
+              <i class="fa-solid fa-right-from-bracket"></i>
+            </a>
+          </div>
+        {% else %}
+          <div class="d-grid gap-2">
+            <a href="{{ url_for('auth.login') }}" class="btn btn-stitch-secondary btn-sm justify-content-center">
+              <i class="fa-solid fa-right-to-bracket"></i> Log In
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </aside>
+
+    <!-- Main Workspace Container -->
+    <div class="app-content-wrapper">
+      <!-- Top Header Bar -->
+      <header class="top-header">
+        <div class="d-flex align-items-center gap-3">
+          <button class="btn btn-stitch-secondary btn-sm d-lg-none py-1 px-2" id="sidebarToggleBtn" type="button">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          <div class="header-title-box">
+            <h1>{% block page_title %}Network Intelligence Studio{% endblock %}</h1>
+            <p>{% block page_subtitle %}Design networks. Simulate traffic. Analyse performance. Understand failures.{% endblock %}</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <div class="status-pill d-none d-md-inline-flex">
+            <span class="status-dot"></span>
+            <span>AI Engine Ready</span>
+          </div>
+          {% block header_actions %}
+            <a href="{{ url_for('interview.setup_view') }}" class="btn btn-stitch-primary btn-sm">
+              <i class="fa-solid fa-play"></i> Start Session
+            </a>
+          {% endblock %}
+        </div>
+      </header>
+
+      <!-- Main Body Content -->
+      <main class="main-workspace">
+        {% block content %}{% endblock %}
+      </main>
+
+      <!-- Footer -->
+      <footer>
+        <div class="container-fluid">
+          <p class="mb-0">InterviewIQ &copy; 2026 — AI Candidate Intelligence & Performance Studio | Google Stitch Design System</p>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1100;">
+    <div id="liveToast" class="toast align-items-center text-bg-dark border border-secondary" role="alert" aria-live="assertive" aria-atomic="true">
+      <div class="d-flex">
+        <div class="toast-body" id="toastMessage">
+          Notification
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtn = document.getElementById('sidebarToggleBtn');
+      const sidebar = document.getElementById('appSidebar');
+      if (toggleBtn && sidebar) {
+        toggleBtn.addEventListener('click', () => {
+          sidebar.classList.toggle('show-sidebar');
+        });
+      }
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

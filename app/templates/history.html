@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Interview History & Archive — InterviewIQ Studio{% endblock %}
+
+{% block page_title %}Interview History & Performance Log{% endblock %}
+{% block page_subtitle %}Review past mock interview sessions, readiness trends, and detailed AI evaluation reports.{% endblock %}
+
+{% block content %}
+<div class="container-fluid p-0">
+  
+  <div class="stitch-card p-4 mb-4">
+    <div class="stitch-card-header mb-3">
+      <h5 class="stitch-card-title"><i class="fa-solid fa-clock-rotate-left text-indigo"></i> Completed Session Archive</h5>
+      <span class="text-secondary small">Database Records</span>
+    </div>
+
+    <div class="table-responsive">
+      <table class="stitch-table">
+        <thead>
+          <tr>
+            <th>Date & Time</th>
+            <th>Role Target</th>
+            <th>Interview Type</th>
+            <th>Difficulty</th>
+            <th>Overall Score</th>
+            <th>Readiness Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if interviews %}
+            {% for item in interviews %}
+              <tr>
+                <td class="small text-secondary">{{ item.started_at.strftime('%Y-%m-%d %H:%M') if item.started_at else 'Recent' }}</td>
+                <td class="fw-semibold text-main">{{ item.role }}</td>
+                <td><span class="stitch-badge bg-dark border border-subtle text-main">{{ item.interview_type }}</span></td>
+                <td class="small text-muted">{{ item.difficulty }}</td>
+                <td class="fw-bold text-emerald">{{ item.overall_score if item.overall_score is not none else 'In Progress' }}{% if item.overall_score %}%{% endif %}</td>
+                <td>
+                  {% if item.readiness_score and item.readiness_score >= 75 %}
+                    <span class="stitch-badge badge-ready">Ready</span>
+                  {% elif item.readiness_score and item.readiness_score >= 60 %}
+                    <span class="stitch-badge badge-moderate">Moderate</span>
+                  {% else %}
+                    <span class="stitch-badge badge-needs-practice">Needs Practice</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.status == 'completed' %}
+                    <a href="{{ url_for('analysis.report_view', interview_id=item.id) }}" class="btn-stitch-secondary py-1 px-3 fs-7">
+                      Open Report
+                    </a>
+                  {% else %}
+                    <a href="{{ url_for('interview.interview_session', interview_id=item.id) }}" class="btn-stitch-primary py-1 px-3 fs-7">
+                      Resume
+                    </a>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="7" class="text-center text-muted py-4">No historical sessions recorded yet. Start your first mock interview session!</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
