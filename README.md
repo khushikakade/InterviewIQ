@@ -1,67 +1,126 @@
-# InterviewIQ: AI-Powered Interview Analytics 🚀
+# InterviewIQ — AI Candidate Intelligence & Performance Studio 🚀
 
-InterviewIQ is a premium, browser-native application designed to help professionals master their interview skills. By combining Computer Vision, NLP, and Machine Learning, the platform provides deep, actionable insights into your performance, delivery, and body language.
+[![Design System](https://img.shields.io/badge/UI/UX-Google%20Stitch%20Design%20System-6366F1)](https://stitch.withgoogle.com/)
+[![Backend](https://img.shields.io/badge/Backend-Flask%20%7C%20Python%203.9+-000000?logo=flask)](https://flask.palletsprojects.com/)
+[![Database](https://img.shields.io/badge/Database-SQLite%20%7C%20SQLAlchemy-003B57?logo=sqlite)](https://www.sqlite.org/)
+[![AI Engine](https://img.shields.io/badge/AI%20Core-MediaPipe%20%7C%20NLP%20%7C%20Speech-06B6D4)](https://google.github.io/mediapipe/)
+
+**InterviewIQ** is a next-generation AI candidate evaluation platform redesigned with the **Google Stitch UI/UX Design System**. It provides real-time speech pacing, MediaPipe facial posture cues, NLP technical concept scoring, STAR behavioral framework analysis, and Explainable AI (XAI) multi-dimensional interview readiness tracking.
+
+---
+
+## 🎨 Google Stitch Design System
+
+The application features a modern, dark-mode technical workspace built according to Google Stitch design principles:
+- **Dark Slate Workspace Palette**: Deep obsidian background (`#0B0E14`), elevated surface cards (`#181C2A`), and glowing 1px subtle borders (`rgba(99, 102, 241, 0.35)`).
+- **Vibrant Accents**: High-contrast indicators (Indigo `#6366F1`, Cyan `#06B6D4`, Emerald `#10B981`, Amber `#F59E0B`, Rose `#F43F5E`).
+- **Responsive App Shell**: Left navigation sidebar, dynamic top bar header, radial score progress rings, metric tiles, dropzone upload boxes, and Google Sans typography.
+
+---
 
 ## 🌟 Key Features
 
-### 🏛️ Professional Success Toolkit
-A comprehensive suite of career resources directly integrated into the dashboard:
-- **The STAR Method Guide**: Master behavioral questions with a structured storytelling framework.
-- **Salary Negotiation Masterclass**: Strategy-driven advice for handling compensation discussions.
-- **Body Language Pro**: Learn non-verbal cues that project confidence and authority.
-- **Follow-up Templates**: High-impact thank-you note templates for various professional scenarios.
+### 📊 1. Network & Performance Intelligence Dashboard
+- **Radial Score Progress Ring**: Visual SVG readiness percentage gauge and status badges (`READY`, `MODERATE`, `NEEDS PRACTICE`).
+- **6-Dimension Score Grid**: Technical Depth, Communication, Presentation Cues, Speech Pacing, Answer Structure (STAR), and Answer Quality.
+- **Interactive Performance Trends**: Chart.js progression charts tracking overall score, confidence, communication, and filler word frequency over time.
 
-### 👨‍💼 Career Coach Perspective
-Beyond raw data, InterviewIQ provides a virtual coaching layer. Our **Senior Career Advisor** persona analyzes your final scores to give context-aware advice, helping you bridge the gap between "good" and "exceptional."
+### 📄 2. Resume & Job Description Skill Matcher
+- **Resume Upload & Extraction**: Drag-and-drop file upload zone (PDF/DOCX) with PyMuPDF text parsing for candidate name, word count, skills cloud, education, experience, projects, and certifications.
+- **Job Description Matcher**: Real-time Job Description skill matching (`/api/jd/analyze`) displaying match percentage, matched skills (emerald badges), missing skills (rose badges), and gap recommendations.
 
-### 📊 Comprehensive Analytics
-- **Visual Intelligence**: Real-time emotion tracking, eye contact analysis, and nervousness detection.
-- **Speech Metrics**: Words per minute (WPM), filler word rate, and silence-to-speech ratios.
-- **NLP Insights**: Vocabulary richness, communication clarity, and key topic extraction.
-- **Interactive Timeline**: Replay your interview with a synchronized emotion and nervousness timeline.
+### ⚙️ 3. Personalized Mock Interview Studio
+- Customized mock session setup by target role, interview type (Mixed, Technical, Behavioral, HR), difficulty, and question count.
+- Linked resume skill integration for personalized question generation.
+- Device permission pre-check card for WebCam and microphone readiness.
+
+### 📹 4. Mock Interview Screen & Live Metrics HUD
+- Live WebCam preview feed with MediaPipe eye contact tracking cue and real-time audio soundwave visualizer.
+- **Live Metric Tiles**: Real-time Eye Contact %, Speech Rate (WPM), Filler Words count, and Head Stability.
+- **Speech-to-Text & Fallback**: Automatic speech transcription with manual text editing fallback, question palette pills, and recording controls.
+
+### 📑 5. Detailed Report & Explainable AI (XAI)
+- **Transparent Scoring System**: Weighted metric calculation (Answer Quality 25%, Communication 20%, Technical Knowledge 20%, Speech Pacing 15%, Vision Cues 10%, Answer Structure 10%).
+- **Explainable AI Cards**: Context-aware positive contributing factors and key improvement areas.
+- **STAR Framework Analysis**: Checks behavioral answers for Situation, Task, Action, and Result components.
+- **Replay Timeline Cues**: Synchronized event logs capturing posture, pacing, and eye contact cues during responses.
+- **7-Day Action Plan**: Personalized day-by-day practice schedule based on detected weaknesses.
+
+### 🎯 6. Targeted Weakness Practice Mode
+- Adaptive micro-practice scenarios to re-evaluate detected weaknesses in real-time.
+- Instant response re-evaluation (`/api/practice/submit`) with feedback reporting and attempt history.
+
+---
 
 ## 🛠️ Technology Stack
-- **Backend**: Flask (Python)
-- **Frontend**: Custom HTML5, CSS3 (Vanilla), and JavaScript
-- **AI/ML Core**:
-    - **Whisper**: High-accuracy speech-to-text transcription.
-    - **MediaPipe**: Facial landmarking and movement tracking.
-    - **scikit-learn**: Random Forest scoring model.
-    - **spaCy & NLTK**: Natural language processing and keyword extraction.
 
-## 🚀 Quick Start
+- **Frontend**: Google Stitch CSS Tokens, HTML5, Vanilla JavaScript, Chart.js, FontAwesome 6
+- **Backend**: Flask (Python 3.9+)
+- **Database**: SQLite with SQLAlchemy ORM
+- **AI / ML & Analytics Core**:
+  - **MediaPipe & OpenCV**: Facial landmark tracking and posture stability
+  - **Speech-to-Text**: Web Speech API & audio transcription pipeline
+  - **spaCy / NLTK**: NLP keyword extraction, similarity, and technical depth scoring
+  - **scikit-learn**: Feature engineering & scoring predictors
 
-### 1. Prerequisites
-Ensure you have Python 3.9+ installed and the required dependencies:
+---
+
+## 🚀 Quick Start Guide
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/khushikakade/InterviewIQ.git
+cd InterviewIQ
+```
+
+### 2. Set Up Virtual Environment
+
+- **Windows (PowerShell)**:
+  ```powershell
+  python -m venv venv
+  .\venv\Scripts\Activate.ps1
+  ```
+
+- **macOS / Linux**:
+  ```bash
+  python3 -m venv venv
+  source venv/bin/activate
+  ```
+
+### 3. Install Dependencies
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Run the Application
-Start the Flask server:
+### 4. Run the Application
 ```bash
-python main.py
+python app.py
 ```
-Access the dashboard at `http://localhost:5000`.
 
-
-
-🚀 Live App: https://interviewiq-2-hip6.onrender.com
-
-## Features
-
-* AI-based interview analysis
-* Speech + NLP + CV insights
-* Performance scoring
-
-
-### 3. Usage
-- **Analyze**: Upload a video of your mock interview or recorded talk.
-- **Review**: Navigate through the interactive dashboard to see your scores.
-- **Learn**: Use the **Professional Toolkit** and **Career Coach** sections to refine your approach.
-
-## 📈 Accuracy & Methodology
-The scoring system is powered by a proprietary Random Forest model trained on 18 distinct features including facial stability, communication pace, and linguistic variety. Accuracy is currently optimized for professional executive interviews.
+### 5. Access in Browser
+Open your browser and navigate to:
+👉 **[http://127.0.0.1:5000](http://127.0.0.1:5000)**
 
 ---
-*Built for professionals who refuse to settle for "average."*
+
+## 📁 Repository Structure
+
+```text
+InterviewIQ/
+├── app/
+│   ├── ml/             # ML feature engineering & scoring models
+│   ├── models/         # SQLAlchemy DB models (User, Resume, Interview, Question, Answer, Score, Practice)
+│   ├── routes/         # Flask Blueprints (Auth, Resume, Interview, Analysis, Dashboard, Practice)
+│   ├── services/       # AI services (NLP, Speech, Vision, Question, Scoring, Recommendation)
+│   ├── static/         # Google Stitch CSS design system & JavaScript controllers
+│   ├── templates/      # Jinja2 HTML templates with Google Stitch App Shell layout
+│   └── utils/          # File utilities & text validators
+├── app.py              # Main application entry point
+├── config.py           # Configuration settings
+├── requirements.txt    # Python package dependencies
+└── README.md           # Documentation
+```
+
+---
+
+*Built with Google Stitch Design Principles for candidates who strive for interview mastery.*
